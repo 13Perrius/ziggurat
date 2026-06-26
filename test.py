@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 import operator as op
 
-from effect import *
+from core import *
 
 @dataclass
 class String(Effect[int]):

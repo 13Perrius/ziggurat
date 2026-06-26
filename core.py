@@ -16,7 +16,6 @@ class Handler:
 class GenDescr:
   def __get__(self, obj, owner):
     if obj is None: return self
-    if obj.mat: return obj.val
     def _drive():
       if not obj.args:
         rcv = yield obj.val
