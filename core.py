@@ -55,7 +55,7 @@ looke = lift(look)
 
 class Perform:
   gen = GenDescr()
-  def __init__(self, val=None, mat=False, f=lambda x: x, args=None):
+  def __init__(self, val=None, mat=False, f=None, args=None):
     self.val = val
     self.mat = mat
     self.f = f
