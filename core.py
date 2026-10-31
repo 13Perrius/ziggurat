@@ -31,19 +31,17 @@ def pure(x):
   return Perform(val=x, mat=True)
 
 def lift(f):
-  def _lifted(*args):
+  def lifted(*args):
     if any(isinstance(a, Perform) for a in args):
       args = tuple(map(pure, args))
       return Perform(f=lift(f), args=args)
-    else:
-      return f(*args)
-  return _lifted
+    return f(*args)
+  return lifted
 
 stre = lift(str)
 
-def look(m, k): return m[k]
-
-looke = lift(look)
+@lift
+def looke(m, k): return m[k]
 
 @dataclass
 class Perform:
