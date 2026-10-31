@@ -1,12 +1,11 @@
 from __future__ import annotations
-from typing import Callable, Generator, Generic, TypeVar
+from typing import Callable, Generator, Generic, TypeVar, Any
 import operator as op
 from dataclasses import dataclass
 
 T = TypeVar('T')
 
-class Effect(Generic[T]):
-  pass
+class Effect(Generic[T]): pass
 
 @dataclass
 class Handler:
@@ -16,22 +15,16 @@ class Handler:
 class GenDescr:
   def __get__(self, obj, owner):
     if obj is None: return self
-    def _drive():
+    def drive():
       if not obj.args:
         rcv = yield obj.val
       else:
         xs = []
-        for a in obj.args:
-          if a.mat:
-            x = a.val
-          else:
-            x = yield from a.gen
-          xs.append(x)
+        for a in obj.args: xs.append(a.val if a.mat else (yield from a.gen))
         rcv = obj.f(*xs)
-      obj.mat = True
-      obj.val = rcv
+      obj.mat, obj.val = True, rcv
       return rcv
-    return _drive()
+    return drive()
 
 def pure(x):
   if isinstance(x, Perform): return x
@@ -48,18 +41,17 @@ def lift(f):
 
 stre = lift(str)
 
-def look(m, k): 
-    return m[k]
+def look(m, k): return m[k]
 
 looke = lift(look)
 
+@dataclass
 class Perform:
   gen = GenDescr()
-  def __init__(self, val=None, mat=False, f=None, args=None):
-    self.val = val
-    self.mat = mat
-    self.f = f
-    self.args = args
+  val: Any|None = None
+  mat: bool = False
+  f: Callable|None = None
+  args: tuple[Any, ...]|None = None
   def __add__(self, other):
     return lift(op.add)(self, other)
   def __mul__(self, other):
